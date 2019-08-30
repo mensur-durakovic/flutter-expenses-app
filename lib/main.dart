@@ -1,6 +1,8 @@
-import './transaction.dart';
+import 'package:expenses_app/widgets/new_transaction.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+
+import './models/transaction.dart';
+import './widgets/transaction_list.dart';
 
 void main() => runApp(MyApp());
 
@@ -14,8 +16,15 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatelessWidget {
-  final List<Transaction> transactions = [
+class MyHomePage extends StatefulWidget {
+  //String titleInput;
+  //String amountInput;
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  final List<Transaction> _userTransactions = [
     Transaction(
       id: 't1',
       title: 'New shoes',
@@ -30,18 +39,44 @@ class MyHomePage extends StatelessWidget {
     )
   ];
 
-  //String titleInput;
-  //String amountInput;
-  final titleController = TextEditingController();
-  final amountController = TextEditingController();
+  void _addNewTransaction(String txTitle, double txAmount) {
+    final newTx = Transaction(
+      title: txTitle,
+      amount: txAmount,
+      date: DateTime.now(),
+      id: DateTime.now().toString(),
+    );
+
+    setState(() {
+      _userTransactions.add(newTx);
+    });
+  }
+
+  void _startAddNewTransaction(BuildContext ctx){
+    showModalBottomSheet(
+      context: ctx,
+      builder: (_){
+        return NewTransaction(_addNewTransaction);
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text('Expenses App'),
-        ),
-        body: Column(
+      appBar: AppBar(
+        title: Text('Expenses App'),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(
+              Icons.add,
+            ),
+            onPressed: () => _startAddNewTransaction(context),
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             Container(
@@ -52,80 +87,16 @@ class MyHomePage extends StatelessWidget {
                 elevation: 5,
               ),
             ),
-            Card(
-              elevation: 5,
-              child: Container(
-                padding: EdgeInsets.all(10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: <Widget>[
-                    TextField(
-                      decoration: InputDecoration(labelText: 'Title'),
-                      controller: titleController,
-                    ),
-                    TextField(
-                      decoration: InputDecoration(labelText: 'Amount'),
-                      controller: amountController,
-                      //onChanged: (val) => amountInput = val,
-                    ),
-                    FlatButton(
-                      child: Text('Add transaction'),
-                      onPressed: () {
-                        print(titleController.text);
-                        print(amountController.text);
-                      },
-                    )
-                  ],
-                ),
-              ),
-            ),
-            Column(
-                children: transactions.map((tx) {
-              return Card(
-                elevation: 10,
-                child: Row(
-                  children: <Widget>[
-                    Container(
-                      margin: EdgeInsets.symmetric(
-                        vertical: 10,
-                        horizontal: 15,
-                      ),
-                      decoration: BoxDecoration(
-                          border: Border.all(
-                        color: Colors.purple,
-                        width: 2,
-                      )),
-                      padding: EdgeInsets.all(10),
-                      child: Text(
-                        '\$${tx.amount}',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
-                          color: Colors.purple,
-                        ),
-                      ),
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          tx.title,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          DateFormat('dd/MM/yyyy HH:mm').format(tx.date),
-                          style: TextStyle(color: Colors.grey),
-                        ),
-                      ],
-                    )
-                  ],
-                ),
-              );
-            }).toList())
+            
+          TransactionList(_userTransactions),
           ],
-        ));
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _startAddNewTransaction(context),
+        child: Icon(Icons.add),
+      ),
+    );
   }
 }
