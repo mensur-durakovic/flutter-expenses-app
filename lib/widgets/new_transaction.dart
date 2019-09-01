@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 import './adaptive_button.dart';
@@ -92,7 +93,7 @@ class _NewTransactionState extends State<NewTransaction> {
               RaisedButton(
                 color: Theme.of(context).primaryColor,
                 textColor: Theme.of(context).textTheme.button.color,
-                child: Text('Add transaction'),
+                child: const Text('Add transaction'),
                 onPressed: _submitData,
               )
             ],
